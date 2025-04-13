@@ -50,41 +50,6 @@ export type Database = {
           },
         ]
       }
-      booth_participants: {
-        Row: {
-          booth_id: string
-          id: string
-          joined_at: string
-          status: string
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          booth_id: string
-          id?: string
-          joined_at?: string
-          status?: string
-          updated_at?: string
-          user_id: string
-        }
-        Update: {
-          booth_id?: string
-          id?: string
-          joined_at?: string
-          status?: string
-          updated_at?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "booth_participants_booth_id_fkey"
-            columns: ["booth_id"]
-            isOneToOne: false
-            referencedRelation: "virtual_booth_sessions"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       companies: {
         Row: {
           created_at: string
@@ -120,38 +85,6 @@ export type Database = {
           website?: string | null
         }
         Relationships: []
-      }
-      company_accounts: {
-        Row: {
-          company_id: string
-          created_at: string
-          email: string
-          id: string
-          updated_at: string
-        }
-        Insert: {
-          company_id: string
-          created_at?: string
-          email: string
-          id?: string
-          updated_at?: string
-        }
-        Update: {
-          company_id?: string
-          created_at?: string
-          email?: string
-          id?: string
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "company_accounts_company_id_fkey"
-            columns: ["company_id"]
-            isOneToOne: false
-            referencedRelation: "companies"
-            referencedColumns: ["id"]
-          },
-        ]
       }
       jobs: {
         Row: {
@@ -258,56 +191,6 @@ export type Database = {
             columns: ["job_id"]
             isOneToOne: false
             referencedRelation: "jobs"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      virtual_booth_sessions: {
-        Row: {
-          company_id: string
-          created_at: string
-          description: string | null
-          duration_minutes: number
-          id: string
-          is_active: boolean
-          max_participants: number
-          meet_link: string
-          scheduled_date: string
-          title: string
-          updated_at: string
-        }
-        Insert: {
-          company_id: string
-          created_at?: string
-          description?: string | null
-          duration_minutes?: number
-          id?: string
-          is_active?: boolean
-          max_participants?: number
-          meet_link: string
-          scheduled_date: string
-          title: string
-          updated_at?: string
-        }
-        Update: {
-          company_id?: string
-          created_at?: string
-          description?: string | null
-          duration_minutes?: number
-          id?: string
-          is_active?: boolean
-          max_participants?: number
-          meet_link?: string
-          scheduled_date?: string
-          title?: string
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "virtual_booth_sessions_company_id_fkey"
-            columns: ["company_id"]
-            isOneToOne: false
-            referencedRelation: "companies"
             referencedColumns: ["id"]
           },
         ]

@@ -16,12 +16,6 @@ import NotFound from "./pages/NotFound";
 import ProtectedRoute from "./components/Auth/ProtectedRoute";
 import VirtualBooth from "./pages/VirtualBooth";
 
-// Company dashboard pages
-import CompanyDashboard from "./pages/company/Dashboard";
-import CompanyJobs from "./pages/company/Jobs";
-import CompanyApplications from "./pages/company/Applications";
-import CompanyVirtualBooths from "./pages/company/VirtualBooths";
-
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -48,29 +42,6 @@ const App = () => (
                 <Profile />
               </ProtectedRoute>
             } />
-            
-            {/* Company Dashboard Routes */}
-            <Route path="/company/dashboard" element={
-              <ProtectedRoute>
-                <CompanyDashboard />
-              </ProtectedRoute>
-            } />
-            <Route path="/company/jobs" element={
-              <ProtectedRoute>
-                <CompanyJobs />
-              </ProtectedRoute>
-            } />
-            <Route path="/company/applications" element={
-              <ProtectedRoute>
-                <CompanyApplications />
-              </ProtectedRoute>
-            } />
-            <Route path="/company/virtual-booths" element={
-              <ProtectedRoute>
-                <CompanyVirtualBooths />
-              </ProtectedRoute>
-            } />
-            
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

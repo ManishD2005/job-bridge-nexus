@@ -1,8 +1,9 @@
 
 import { Link } from "react-router-dom";
-import { Building, MapPin, Clock, Bookmark } from "lucide-react";
+import { Building, MapPin, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import SaveJobButton from "./SaveJobButton";
 
 export interface JobProps {
   id: string;
@@ -38,9 +39,7 @@ const JobCard = ({ job }: { job: JobProps }) => {
             </Link>
           </div>
         </div>
-        <Button variant="ghost" size="icon" aria-label="Save job">
-          <Bookmark className="h-5 w-5" />
-        </Button>
+        <SaveJobButton jobId={job.id} />
       </div>
       
       <div className="flex flex-wrap gap-2 mt-4 mb-3">

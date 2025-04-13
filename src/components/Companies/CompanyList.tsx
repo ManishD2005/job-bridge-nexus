@@ -1,75 +1,89 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
 import CompanyCard, { CompanyProps } from "./CompanyCard";
-
-// Mock company data
-const mockCompanies: CompanyProps[] = [
-  {
-    id: "1",
-    name: "TechInnovate",
-    logo: "",
-    industry: "Software Development",
-    location: "San Francisco, CA",
-    size: "500-1000 employees",
-    openPositions: 12,
-  },
-  {
-    id: "2",
-    name: "Global Finance",
-    logo: "",
-    industry: "Financial Services",
-    location: "New York, NY",
-    size: "1000+ employees",
-    openPositions: 8,
-  },
-  {
-    id: "3",
-    name: "Green Solutions",
-    logo: "",
-    industry: "Renewable Energy",
-    location: "Austin, TX",
-    size: "100-500 employees",
-    openPositions: 5,
-  },
-  {
-    id: "4",
-    name: "Health Innovations",
-    logo: "",
-    industry: "Healthcare Technology",
-    location: "Boston, MA",
-    size: "100-500 employees",
-    openPositions: 7,
-  },
-  {
-    id: "5",
-    name: "Creative Digital",
-    logo: "",
-    industry: "Digital Marketing",
-    location: "Chicago, IL",
-    size: "50-100 employees",
-    openPositions: 3,
-  },
-  {
-    id: "6",
-    name: "Data Insights",
-    logo: "",
-    industry: "Data Analytics",
-    location: "Seattle, WA",
-    size: "100-500 employees",
-    openPositions: 9,
-  },
-];
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+import { PostgrestError } from "@supabase/supabase-js";
 
 const CompanyList = () => {
   const [searchTerm, setSearchTerm] = useState("");
-  
-  const filteredCompanies = mockCompanies.filter(company => 
-    company.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    company.industry.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    company.location.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const [companies, setCompanies] = useState<CompanyProps[]>([]);
+  const [filteredCompanies, setFilteredCompanies] = useState<CompanyProps[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    fetchCompanies();
+  }, []);
+
+  const fetchCompanies = async () => {
+    try {
+      setIsLoading(true);
+      
+      // First get all companies
+      const { data: companiesData, error: companiesError } = await supabase
+        .from('companies')
+        .select('*');
+
+      if (companiesError) {
+        throw companiesError;
+      }
+
+      // Then get job counts for each company
+      const companyIds = companiesData.map(company => company.id);
+      
+      const { data: jobsData, error: jobsError } = await supabase
+        .from('jobs')
+        .select('company_id, id')
+        .in('company_id', companyIds);
+
+      if (jobsError) {
+        throw jobsError;
+      }
+
+      // Count jobs per company
+      const jobCounts: Record<string, number> = {};
+      jobsData.forEach(job => {
+        jobCounts[job.company_id] = (jobCounts[job.company_id] || 0) + 1;
+      });
+
+      // Format the data to match our CompanyProps structure
+      const formattedCompanies: CompanyProps[] = companiesData.map(company => ({
+        id: company.id,
+        name: company.name,
+        logo: company.logo_url || "",
+        industry: company.industry || "Technology",
+        location: company.location || "Remote",
+        size: "Not specified",
+        openPositions: jobCounts[company.id] || 0
+      }));
+
+      setCompanies(formattedCompanies);
+      setFilteredCompanies(formattedCompanies);
+      
+    } catch (error) {
+      const pgError = error as PostgrestError;
+      toast.error(`Error fetching companies: ${pgError.message}`);
+      console.error(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    // Apply search filter
+    if (searchTerm) {
+      const filtered = companies.filter(company => 
+        company.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        company.industry.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        company.location.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+      setFilteredCompanies(filtered);
+    } else {
+      setFilteredCompanies(companies);
+    }
+  }, [searchTerm, companies]);
 
   return (
     <div>
@@ -83,16 +97,26 @@ const CompanyList = () => {
         />
       </div>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredCompanies.map((company) => (
-          <CompanyCard key={company.id} company={company} />
-        ))}
-      </div>
-      
-      {filteredCompanies.length === 0 && (
-        <div className="text-center py-16">
-          <p className="text-xl text-muted-foreground">No companies found matching your search.</p>
+      {/* Loading state */}
+      {isLoading ? (
+        <div className="flex justify-center py-20">
+          <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full"></div>
         </div>
+      ) : (
+        <>
+          {/* Companies list */}
+          {filteredCompanies.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filteredCompanies.map((company) => (
+                <CompanyCard key={company.id} company={company} />
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-16">
+              <p className="text-xl text-muted-foreground">No companies found matching your search.</p>
+            </div>
+          )}
+        </>
       )}
     </div>
   );

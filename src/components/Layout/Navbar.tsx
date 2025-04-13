@@ -1,170 +1,129 @@
 
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
+import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Menu, X, Briefcase, LogOut, LogIn, User } from "lucide-react";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import ThemeToggle from "@/components/ThemeToggle";
 import { useAuth } from "@/contexts/AuthContext";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { toast } from "sonner";
 
 const Navbar = () => {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const { user, profile, signOut } = useAuth();
-  const navigate = useNavigate();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { user, signOut } = useAuth();
+  const location = useLocation();
+  
+  const navLinks = [
+    { name: "Home", path: "/" },
+    { name: "Companies", path: "/companies" },
+    { name: "Jobs", path: "/jobs" },
+    { name: "Virtual Booth", path: "/virtual-booth" },
+  ];
 
-  const toggleMobileMenu = () => {
-    setMobileMenuOpen(!mobileMenuOpen);
-  };
-
-  const handleSignOut = async () => {
-    try {
-      await signOut();
-      toast.success("Successfully signed out");
-      navigate("/");
-    } catch (error) {
-      toast.error("Failed to sign out");
-    }
+  const isActive = (path: string) => {
+    return location.pathname === path;
   };
 
   return (
-    <nav className="w-full bg-background/80 backdrop-blur-md sticky top-0 z-50 border-b">
-      <div className="container mx-auto px-4 py-3">
-        <div className="flex items-center justify-between">
-          {/* Logo */}
-          <Link to="/" className="flex items-center space-x-2 text-xl font-bold">
-            <Briefcase className="h-6 w-6 text-primary" />
-            <span>JobBridge</span>
-          </Link>
+    <header className="border-b bg-background">
+      <div className="container mx-auto px-4 flex items-center justify-between h-16">
+        {/* Logo */}
+        <Link to="/" className="font-bold text-xl flex items-center">
+          <span className="text-primary mr-1">Career</span>Connect
+        </Link>
 
-          {/* Desktop Menu */}
-          <div className="hidden md:flex items-center space-x-8">
-            <Link to="/" className="font-medium hover:text-primary transition-colors">
-              Home
+        {/* Desktop Navigation */}
+        <nav className="hidden md:flex items-center space-x-6">
+          {navLinks.map((link) => (
+            <Link
+              key={link.path}
+              to={link.path}
+              className={`text-sm font-medium transition-colors hover:text-primary ${
+                isActive(link.path) ? "text-primary" : "text-muted-foreground"
+              }`}
+            >
+              {link.name}
             </Link>
-            <Link to="/companies" className="font-medium hover:text-primary transition-colors">
-              Companies
-            </Link>
-            <Link to="/jobs" className="font-medium hover:text-primary transition-colors">
-              Jobs
-            </Link>
-            {user && (
-              <Link to="/profile" className="font-medium hover:text-primary transition-colors">
-                Profile
+          ))}
+        </nav>
+
+        {/* Right side buttons */}
+        <div className="hidden md:flex items-center space-x-4">
+          <ThemeToggle />
+          
+          {user ? (
+            <>
+              <Link to="/profile">
+                <Button variant="ghost" size="sm">Profile</Button>
               </Link>
-            )}
-          </div>
-
-          {/* Right side buttons */}
-          <div className="flex items-center space-x-4">
-            <ThemeToggle />
-            
-            <div className="hidden md:block">
-              {user ? (
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-                      <Avatar className="h-8 w-8">
-                        <AvatarFallback>
-                          {profile?.full_name?.charAt(0) || user.email?.charAt(0)}
-                        </AvatarFallback>
-                      </Avatar>
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-56">
-                    <div className="flex items-center justify-start gap-2 p-2">
-                      <div className="flex flex-col space-y-1 leading-none">
-                        {profile?.full_name && (
-                          <p className="font-medium">{profile.full_name}</p>
-                        )}
-                        <p className="text-sm text-muted-foreground">{user.email}</p>
-                      </div>
-                    </div>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem asChild>
-                      <Link to="/profile" className="cursor-pointer">
-                        <User className="mr-2 h-4 w-4" />
-                        <span>Profile</span>
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={handleSignOut} className="cursor-pointer">
-                      <LogOut className="mr-2 h-4 w-4" />
-                      <span>Log out</span>
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              ) : (
-                <Button variant="default" size="sm" onClick={() => navigate("/auth")}>
-                  <LogIn className="h-4 w-4 mr-2" />
-                  Sign In
-                </Button>
-              )}
-            </div>
-            
-            <button className="md:hidden" onClick={toggleMobileMenu}>
-              {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-            </button>
-          </div>
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={signOut}
+              >
+                Sign Out
+              </Button>
+            </>
+          ) : (
+            <Link to="/auth">
+              <Button>Sign In</Button>
+            </Link>
+          )}
         </div>
 
-        {/* Mobile Menu */}
-        {mobileMenuOpen && (
-          <div className="md:hidden mt-3 pb-3 space-y-2 border-t pt-3">
-            <Link 
-              to="/" 
-              className="block py-2 px-3 rounded-md hover:bg-muted transition-colors"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              Home
-            </Link>
-            <Link 
-              to="/companies" 
-              className="block py-2 px-3 rounded-md hover:bg-muted transition-colors"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              Companies
-            </Link>
-            <Link 
-              to="/jobs" 
-              className="block py-2 px-3 rounded-md hover:bg-muted transition-colors"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              Jobs
-            </Link>
-            {user && (
-              <Link 
-                to="/profile" 
-                className="block py-2 px-3 rounded-md hover:bg-muted transition-colors"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Profile
-              </Link>
-            )}
-            <div className="pt-2">
-              {user ? (
-                <Button variant="default" className="w-full" onClick={handleSignOut}>
-                  <LogOut className="h-4 w-4 mr-2" />
-                  Sign Out
-                </Button>
-              ) : (
-                <Button variant="default" className="w-full" onClick={() => navigate("/auth")}>
-                  <LogIn className="h-4 w-4 mr-2" />
-                  Sign In
-                </Button>
-              )}
-            </div>
-          </div>
-        )}
+        {/* Mobile Menu Button */}
+        <div className="md:hidden flex items-center">
+          <ThemeToggle />
+          <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
+            <SheetTrigger asChild>
+              <Button variant="ghost" size="icon" className="ml-2">
+                <Menu className="h-5 w-5" />
+                <span className="sr-only">Toggle menu</span>
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="right" className="w-full max-w-xs sm:max-w-sm">
+              <nav className="flex flex-col gap-4 mt-8">
+                {navLinks.map((link) => (
+                  <Link
+                    key={link.path}
+                    to={link.path}
+                    className={`text-base font-medium transition-colors hover:text-primary ${
+                      isActive(link.path) ? "text-primary" : "text-muted-foreground"
+                    }`}
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    {link.name}
+                  </Link>
+                ))}
+                
+                <div className="border-t my-4 pt-4 flex flex-col gap-2">
+                  {user ? (
+                    <>
+                      <Link to="/profile" onClick={() => setIsMenuOpen(false)}>
+                        <Button variant="ghost" className="w-full justify-start">Profile</Button>
+                      </Link>
+                      <Button 
+                        variant="outline" 
+                        className="w-full justify-start"
+                        onClick={() => {
+                          signOut();
+                          setIsMenuOpen(false);
+                        }}
+                      >
+                        Sign Out
+                      </Button>
+                    </>
+                  ) : (
+                    <Link to="/auth" onClick={() => setIsMenuOpen(false)}>
+                      <Button className="w-full">Sign In</Button>
+                    </Link>
+                  )}
+                </div>
+              </nav>
+            </SheetContent>
+          </Sheet>
+        </div>
       </div>
-    </nav>
+    </header>
   );
 };
 

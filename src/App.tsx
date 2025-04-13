@@ -12,6 +12,7 @@ import Profile from "./pages/Profile";
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
 import ProtectedRoute from "./components/Auth/ProtectedRoute";
+import VirtualBooth from "./pages/VirtualBooth";
 
 const queryClient = new QueryClient();
 
@@ -27,6 +28,11 @@ const App = () => (
             <Route path="/auth" element={<Auth />} />
             <Route path="/companies" element={<Companies />} />
             <Route path="/jobs" element={<Jobs />} />
+            <Route path="/virtual-booth" element={
+              <ProtectedRoute>
+                <VirtualBooth />
+              </ProtectedRoute>
+            } />
             <Route path="/profile" element={
               <ProtectedRoute>
                 <Profile />

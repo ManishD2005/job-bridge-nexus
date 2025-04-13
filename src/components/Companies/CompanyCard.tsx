@@ -47,10 +47,12 @@ const CompanyCard = ({ company }: { company: CompanyProps }) => {
         </div>
         
         <div className="flex justify-between space-x-4">
-          <Button variant="outline" className="w-1/2">
-            Company Profile
-          </Button>
-          <Link to={`/companies/${company.id}/jobs`} className="w-1/2">
+          <Link to={`/companies/${company.id}`} className="w-1/2">
+            <Button variant="outline" className="w-full">
+              Company Profile
+            </Button>
+          </Link>
+          <Link to={`/companies/${company.id}`} className="w-1/2">
             <Button className="w-full">
               View Jobs
             </Button>

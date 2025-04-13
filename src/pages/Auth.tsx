@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { toast } from "sonner";
-import { Eye, EyeOff, Mail, Lock, User } from "lucide-react";
+import { Eye, EyeOff, Mail, Lock, User, Building } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -11,6 +11,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import Navbar from "@/components/Layout/Navbar";
 import Footer from "@/components/Layout/Footer";
 import { supabase } from "@/integrations/supabase/client";
+import CompanyAuth from "@/components/Auth/CompanyAuth";
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -81,6 +82,7 @@ const Auth = () => {
         options: {
           data: {
             full_name: signupData.fullName,
+            user_type: 'jobseeker'
           },
         },
       });
@@ -108,15 +110,16 @@ const Auth = () => {
       <main className="flex-grow flex items-center justify-center py-12 px-4">
         <div className="w-full max-w-md">
           <Tabs defaultValue="login" className="w-full">
-            <TabsList className="grid w-full grid-cols-2 mb-8">
-              <TabsTrigger value="login">Login</TabsTrigger>
-              <TabsTrigger value="signup">Sign Up</TabsTrigger>
+            <TabsList className="grid w-full grid-cols-3 mb-8">
+              <TabsTrigger value="login">Job Seeker Login</TabsTrigger>
+              <TabsTrigger value="signup">Job Seeker Signup</TabsTrigger>
+              <TabsTrigger value="company">Company Portal</TabsTrigger>
             </TabsList>
             
             <TabsContent value="login">
               <Card>
                 <CardHeader>
-                  <CardTitle>Login to JobBridge</CardTitle>
+                  <CardTitle>Login to CareerConnect</CardTitle>
                   <CardDescription>
                     Enter your credentials to access your account
                   </CardDescription>
@@ -251,6 +254,10 @@ const Auth = () => {
                   </CardFooter>
                 </form>
               </Card>
+            </TabsContent>
+
+            <TabsContent value="company">
+              <CompanyAuth />
             </TabsContent>
           </Tabs>
         </div>

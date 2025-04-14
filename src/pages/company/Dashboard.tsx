@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
@@ -113,7 +112,7 @@ const CompanyDashboard: React.FC = () => {
             id,
             title
           ),
-          profiles:user_id (
+          profiles!applications_user_id_fkey (
             full_name
           )
         `)
@@ -550,7 +549,85 @@ const CompanyDashboard: React.FC = () => {
                       <Button><PlusCircle className="mr-2 h-4 w-4" /> Post Your First Job</Button>
                     </DialogTrigger>
                     <DialogContent className="sm:max-w-[500px]">
-                      {/* Same dialog content as above */}
+                      <DialogHeader>
+                        <DialogTitle>Create Job Posting</DialogTitle>
+                        <DialogDescription>
+                          Enter the details for your new job posting
+                        </DialogDescription>
+                      </DialogHeader>
+                      <div className="grid gap-4 py-4">
+                        <div className="grid gap-2">
+                          <Label htmlFor="title">Job Title</Label>
+                          <Input 
+                            id="title" 
+                            value={newJob.title} 
+                            onChange={(e) => setNewJob({...newJob, title: e.target.value})} 
+                          />
+                        </div>
+                        <div className="grid gap-2">
+                          <Label htmlFor="description">Description</Label>
+                          <Textarea 
+                            id="description" 
+                            value={newJob.description} 
+                            onChange={(e) => setNewJob({...newJob, description: e.target.value})} 
+                          />
+                        </div>
+                        <div className="grid gap-2">
+                          <Label htmlFor="location">Location</Label>
+                          <Input 
+                            id="location" 
+                            value={newJob.location} 
+                            onChange={(e) => setNewJob({...newJob, location: e.target.value})} 
+                          />
+                        </div>
+                        <div className="grid gap-2">
+                          <Label htmlFor="salary">Salary Range</Label>
+                          <Input 
+                            id="salary" 
+                            value={newJob.salary_range} 
+                            onChange={(e) => setNewJob({...newJob, salary_range: e.target.value})} 
+                          />
+                        </div>
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="grid gap-2">
+                            <Label htmlFor="job_type">Job Type</Label>
+                            <Select 
+                              value={newJob.job_type} 
+                              onValueChange={(value) => setNewJob({...newJob, job_type: value})}
+                            >
+                              <SelectTrigger id="job_type">
+                                <SelectValue placeholder="Select job type" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="Full-time">Full-time</SelectItem>
+                                <SelectItem value="Part-time">Part-time</SelectItem>
+                                <SelectItem value="Contract">Contract</SelectItem>
+                                <SelectItem value="Internship">Internship</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          <div className="grid gap-2">
+                            <Label htmlFor="experience">Experience Level</Label>
+                            <Select 
+                              value={newJob.experience_level} 
+                              onValueChange={(value) => setNewJob({...newJob, experience_level: value})}
+                            >
+                              <SelectTrigger id="experience">
+                                <SelectValue placeholder="Select level" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="Entry-level">Entry-level</SelectItem>
+                                <SelectItem value="Mid-level">Mid-level</SelectItem>
+                                <SelectItem value="Senior">Senior</SelectItem>
+                                <SelectItem value="Executive">Executive</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                        </div>
+                      </div>
+                      <DialogFooter>
+                        <Button onClick={handleCreateJob}>Post Job</Button>
+                      </DialogFooter>
                     </DialogContent>
                   </Dialog>
                 </div>
@@ -714,7 +791,70 @@ const CompanyDashboard: React.FC = () => {
                       <Button><PlusCircle className="mr-2 h-4 w-4" /> Schedule Your First Booth</Button>
                     </DialogTrigger>
                     <DialogContent className="sm:max-w-[500px]">
-                      {/* Same dialog content as above */}
+                      <DialogHeader>
+                        <DialogTitle>Create Virtual Booth</DialogTitle>
+                        <DialogDescription>
+                          Schedule a new virtual recruitment session
+                        </DialogDescription>
+                      </DialogHeader>
+                      <div className="grid gap-4 py-4">
+                        <div className="grid gap-2">
+                          <Label htmlFor="booth_title">Title</Label>
+                          <Input 
+                            id="booth_title" 
+                            value={newBooth.title} 
+                            onChange={(e) => setNewBooth({...newBooth, title: e.target.value})} 
+                          />
+                        </div>
+                        <div className="grid gap-2">
+                          <Label htmlFor="booth_description">Description</Label>
+                          <Textarea 
+                            id="booth_description" 
+                            value={newBooth.description} 
+                            onChange={(e) => setNewBooth({...newBooth, description: e.target.value})} 
+                          />
+                        </div>
+                        <div className="grid gap-2">
+                          <Label htmlFor="meet_link">Meeting Link (Google Meet, Zoom, etc.)</Label>
+                          <Input 
+                            id="meet_link" 
+                            value={newBooth.meet_link} 
+                            onChange={(e) => setNewBooth({...newBooth, meet_link: e.target.value})} 
+                          />
+                        </div>
+                        <div className="grid gap-2">
+                          <Label htmlFor="scheduled_date">Date and Time</Label>
+                          <Input 
+                            id="scheduled_date" 
+                            type="datetime-local"
+                            value={newBooth.scheduled_date} 
+                            onChange={(e) => setNewBooth({...newBooth, scheduled_date: e.target.value})} 
+                          />
+                        </div>
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="grid gap-2">
+                            <Label htmlFor="duration">Duration (minutes)</Label>
+                            <Input 
+                              id="duration" 
+                              type="number"
+                              value={newBooth.duration_minutes.toString()} 
+                              onChange={(e) => setNewBooth({...newBooth, duration_minutes: parseInt(e.target.value) || 30})} 
+                            />
+                          </div>
+                          <div className="grid gap-2">
+                            <Label htmlFor="max_participants">Max Participants</Label>
+                            <Input 
+                              id="max_participants" 
+                              type="number"
+                              value={newBooth.max_participants.toString()} 
+                              onChange={(e) => setNewBooth({...newBooth, max_participants: parseInt(e.target.value) || 10})} 
+                            />
+                          </div>
+                        </div>
+                      </div>
+                      <DialogFooter>
+                        <Button onClick={handleCreateBooth}>Create Booth</Button>
+                      </DialogFooter>
                     </DialogContent>
                   </Dialog>
                 </div>

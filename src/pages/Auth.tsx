@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { toast } from "sonner";
-import { Eye, EyeOff, Mail, Lock, User, Building2 } from "lucide-react";
+import { Eye, EyeOff, Mail, Lock, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -18,16 +18,13 @@ const Auth = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [loginData, setLoginData] = useState({ 
     email: "", 
-    password: "",
-    userType: "jobseeker" 
+    password: "" 
   });
   const [signupData, setSignupData] = useState({ 
     fullName: "", 
     email: "", 
     password: "", 
-    confirmPassword: "",
-    userType: "jobseeker",
-    companyName: "" 
+    confirmPassword: "" 
   });
 
   // Handle login submission
@@ -50,22 +47,6 @@ const Auth = () => {
 
       // Check user type and redirect accordingly
       const { data: userTypeData } = await supabase.rpc('get_user_type', { user_id: data.user?.id });
-      
-      // If requested company login but user is not a company account, show error
-      if (loginData.userType === 'company' && userTypeData !== 'company') {
-        await supabase.auth.signOut();
-        toast.error("This is not a company account. Please use a company account or switch to job seeker login.");
-        setIsLoading(false);
-        return;
-      }
-      
-      // If requested jobseeker login but user is a company account, show error
-      if (loginData.userType === 'jobseeker' && userTypeData === 'company') {
-        await supabase.auth.signOut();
-        toast.error("This is a company account. Please use job seeker credentials or switch to company login.");
-        setIsLoading(false);
-        return;
-      }
       
       if (userTypeData === 'company') {
         navigate('/company/dashboard');
@@ -101,12 +82,6 @@ const Auth = () => {
       return;
     }
 
-    // For company accounts, company name is required
-    if (signupData.userType === 'company' && !signupData.companyName) {
-      toast.error("Company name is required for company accounts");
-      return;
-    }
-
     try {
       setIsLoading(true);
       const { data, error } = await supabase.auth.signUp({
@@ -115,8 +90,7 @@ const Auth = () => {
         options: {
           data: {
             full_name: signupData.fullName,
-            user_type: signupData.userType,
-            ...(signupData.userType === 'company' ? { company_name: signupData.companyName } : {})
+            user_type: 'jobseeker'
           },
         },
       });
@@ -124,15 +98,7 @@ const Auth = () => {
       if (error) throw error;
 
       toast.success("Registration successful! Please check your email to verify your account.");
-      
-      // Redirect based on user type
-      if (data?.user) {
-        if (signupData.userType === 'company') {
-          navigate("/company/dashboard");
-        } else {
-          navigate("/");
-        }
-      }
+      navigate("/");
     } catch (error: any) {
       toast.error(error.message || "Failed to sign up. Please try again.");
     } finally {
@@ -154,7 +120,7 @@ const Auth = () => {
             <TabsContent value="login">
               <Card>
                 <CardHeader>
-                  <CardTitle>Login to JobBridge</CardTitle>
+                  <CardTitle>Login to CareerConnect</CardTitle>
                   <CardDescription>
                     Enter your credentials to access your account
                   </CardDescription>
@@ -200,26 +166,11 @@ const Auth = () => {
                         </button>
                       </div>
                     </div>
-                    <div className="space-y-2">
-                      <Label>Account Type</Label>
-                      <div className="flex space-x-4">
-                        <Button
-                          type="button"
-                          variant={loginData.userType === 'jobseeker' ? 'default' : 'outline'}
-                          className="flex-1"
-                          onClick={() => setLoginData({...loginData, userType: 'jobseeker'})}
-                        >
-                          <User className="mr-2 h-4 w-4" /> Job Seeker
-                        </Button>
-                        <Button
-                          type="button"
-                          variant={loginData.userType === 'company' ? 'default' : 'outline'}
-                          className="flex-1"
-                          onClick={() => setLoginData({...loginData, userType: 'company'})}
-                        >
-                          <Building2 className="mr-2 h-4 w-4" /> Company
-                        </Button>
-                      </div>
+                    <div className="mt-4 text-sm text-center">
+                      <p>Are you a company looking to hire?</p>
+                      <Link to="/company/auth" className="text-primary hover:underline mt-1 inline-block">
+                        Login as a company
+                      </Link>
                     </div>
                   </CardContent>
                   <CardFooter>
@@ -302,40 +253,9 @@ const Auth = () => {
                         />
                       </div>
                     </div>
-                    <div className="space-y-2">
-                      <Label>Account Type</Label>
-                      <div className="flex space-x-4">
-                        <Button
-                          type="button"
-                          variant={signupData.userType === 'jobseeker' ? 'default' : 'outline'}
-                          className="flex-1"
-                          onClick={() => setSignupData({...signupData, userType: 'jobseeker'})}
-                        >
-                          <User className="mr-2 h-4 w-4" /> Job Seeker
-                        </Button>
-                        <Button
-                          type="button"
-                          variant={signupData.userType === 'company' ? 'default' : 'outline'}
-                          className="flex-1"
-                          onClick={() => setSignupData({...signupData, userType: 'company'})}
-                        >
-                          <Building2 className="mr-2 h-4 w-4" /> Company
-                        </Button>
-                      </div>
+                    <div className="pt-4 text-sm text-muted-foreground">
+                      <p className="text-center">For company registration, please contact us at support@careerconnect.com</p>
                     </div>
-
-                    {signupData.userType === 'company' && (
-                      <div className="space-y-2">
-                        <Label htmlFor="signup-company-name">Company Name</Label>
-                        <Input 
-                          id="signup-company-name"
-                          placeholder="Enter your company name"
-                          value={signupData.companyName}
-                          onChange={(e) => setSignupData({...signupData, companyName: e.target.value})}
-                          required
-                        />
-                      </div>
-                    )}
                   </CardContent>
                   <CardFooter>
                     <Button type="submit" className="w-full" disabled={isLoading}>

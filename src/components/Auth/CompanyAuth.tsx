@@ -12,11 +12,8 @@ import { Eye, EyeOff, Mail, Lock, Building2 } from 'lucide-react';
 const CompanyAuth = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [companyName, setCompanyName] = useState('');
-  const [fullName, setFullName] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [isLogin, setIsLogin] = useState(true);
   const navigate = useNavigate();
 
   const handleCompanyLogin = async (e: React.FormEvent) => {
@@ -52,90 +49,17 @@ const CompanyAuth = () => {
     }
   };
 
-  const handleCompanySignup = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!email || !password || !companyName || !fullName) {
-      toast.error("Please fill in all fields");
-      return;
-    }
-    
-    if (password.length < 6) {
-      toast.error("Password must be at least 6 characters");
-      return;
-    }
-    
-    setIsLoading(true);
-    
-    try {
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: {
-            full_name: fullName,
-            user_type: 'company',
-            company_name: companyName
-          }
-        }
-      });
-
-      if (error) throw error;
-      
-      toast.success("Registration successful! Please check your email to verify your account.");
-      navigate('/company/dashboard');
-    } catch (error: any) {
-      toast.error(error.message || "Registration failed");
-      console.error(error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   return (
     <div className="max-w-md mx-auto mt-10">
       <Card>
         <CardHeader>
-          <CardTitle>{isLogin ? 'Company Login' : 'Register Company'}</CardTitle>
+          <CardTitle>Company Login</CardTitle>
           <CardDescription>
-            {isLogin 
-              ? 'Enter your credentials to access your company account' 
-              : 'Create a new company account to start recruiting'}
+            Enter your credentials to access your company account
           </CardDescription>
         </CardHeader>
-        <form onSubmit={isLogin ? handleCompanyLogin : handleCompanySignup}>
+        <form onSubmit={handleCompanyLogin}>
           <CardContent className="space-y-4">
-            {!isLogin && (
-              <>
-                <div className="space-y-2">
-                  <Label htmlFor="fullName">Full Name</Label>
-                  <Input
-                    id="fullName"
-                    type="text"
-                    placeholder="John Doe"
-                    value={fullName}
-                    onChange={(e) => setFullName(e.target.value)}
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="companyName">Company Name</Label>
-                  <div className="relative">
-                    <Building2 className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                    <Input
-                      id="companyName"
-                      type="text"
-                      placeholder="Acme Inc."
-                      className="pl-10"
-                      value={companyName}
-                      onChange={(e) => setCompanyName(e.target.value)}
-                      required
-                    />
-                  </div>
-                </div>
-              </>
-            )}
-            
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <div className="relative">
@@ -174,25 +98,23 @@ const CompanyAuth = () => {
                 </button>
               </div>
             </div>
+            
+            <div className="pt-4 text-sm text-muted-foreground">
+              <p>For company access, please contact us at support@careerconnect.com</p>
+              <p className="mt-2">Demo company accounts:</p>
+              <ul className="list-disc pl-5 mt-1">
+                <li>technova@example.com</li>
+                <li>ecosolutions@example.com</li>
+                <li>financewave@example.com</li>
+              </ul>
+              <p className="mt-2">Password for all demo accounts: <strong>Company123!</strong></p>
+            </div>
           </CardContent>
           
           <CardFooter className="flex flex-col space-y-4">
             <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading 
-                ? (isLogin ? "Logging in..." : "Creating account...") 
-                : (isLogin ? "Login" : "Create account")}
+              {isLoading ? "Logging in..." : "Login"}
             </Button>
-            
-            <p className="text-center text-sm">
-              {isLogin ? "Don't have a company account?" : "Already have a company account?"}
-              <button 
-                type="button" 
-                className="ml-1 text-primary hover:underline"
-                onClick={() => setIsLogin(!isLogin)}
-              >
-                {isLogin ? "Sign up" : "Log in"}
-              </button>
-            </p>
           </CardFooter>
         </form>
       </Card>

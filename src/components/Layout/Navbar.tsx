@@ -37,7 +37,7 @@ const Navbar = () => {
     <header className="border-b bg-background">
       <div className="container mx-auto px-4 flex items-center justify-between h-16">
         {/* Logo */}
-        <Link to="/" className="font-bold text-xl flex items-center">
+        <Link to={userType === 'company' ? "/company/dashboard" : "/"} className="font-bold text-xl flex items-center">
           <span className="text-primary mr-1">Career</span>Connect
           {userType === 'company' && (
             <span className="ml-2 bg-primary/10 text-primary text-xs px-2 py-0.5 rounded-full">
@@ -67,15 +67,16 @@ const Navbar = () => {
           
           {user ? (
             <>
-              <Link to="/profile">
-                <Button variant="ghost" size="sm">Profile</Button>
-              </Link>
-              {userType === 'company' && (
+              {userType === 'company' ? (
                 <Link to="/company/dashboard">
                   <Button variant="outline" size="sm">
                     <Building2 className="mr-2 h-4 w-4" />
                     Dashboard
                   </Button>
+                </Link>
+              ) : (
+                <Link to="/profile">
+                  <Button variant="ghost" size="sm">Profile</Button>
                 </Link>
               )}
               <Button 
@@ -126,15 +127,16 @@ const Navbar = () => {
                 <div className="border-t my-4 pt-4 flex flex-col gap-2">
                   {user ? (
                     <>
-                      <Link to="/profile" onClick={() => setIsMenuOpen(false)}>
-                        <Button variant="ghost" className="w-full justify-start">Profile</Button>
-                      </Link>
-                      {userType === 'company' && (
+                      {userType === 'company' ? (
                         <Link to="/company/dashboard" onClick={() => setIsMenuOpen(false)}>
                           <Button variant="outline" className="w-full justify-start">
                             <Building2 className="mr-2 h-4 w-4" />
                             Company Dashboard
                           </Button>
+                        </Link>
+                      ) : (
+                        <Link to="/profile" onClick={() => setIsMenuOpen(false)}>
+                          <Button variant="ghost" className="w-full justify-start">Profile</Button>
                         </Link>
                       )}
                       <Button 

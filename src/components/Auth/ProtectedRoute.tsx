@@ -17,14 +17,21 @@ const ProtectedRoute = ({ children, companyOnly = false }: ProtectedRouteProps) 
   useEffect(() => {
     if (!isLoading) {
       if (!user) {
-        navigate("/auth", { replace: true });
+        if (companyOnly) {
+          navigate("/company/auth", { replace: true });
+        } else {
+          navigate("/auth", { replace: true });
+        }
       } else if (companyOnly && userType !== 'company') {
         // If this route requires a company account but user isn't a company
         toast.error("This page is only accessible to company accounts");
         navigate("/", { replace: true });
+      } else if (userType === 'company' && !location.pathname.startsWith('/company')) {
+        // If company user tries to access jobseeker pages
+        navigate("/company/dashboard", { replace: true });
       }
     }
-  }, [user, isLoading, navigate, companyOnly, userType]);
+  }, [user, isLoading, navigate, companyOnly, userType, location.pathname]);
 
   if (isLoading) {
     return (

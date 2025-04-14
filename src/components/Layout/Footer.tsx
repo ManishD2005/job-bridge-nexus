@@ -11,7 +11,7 @@ const Footer = () => {
           <div>
             <div className="flex items-center space-x-2 mb-4">
               <Briefcase className="h-6 w-6 text-primary" />
-              <span className="text-xl font-bold">JobBridge</span>
+              <span className="text-xl font-bold">Career Connect</span>
             </div>
             <p className="text-muted-foreground mb-4">
               Connecting talented individuals with innovative companies through virtual career fairs.
@@ -50,7 +50,7 @@ const Footer = () => {
             <h3 className="font-semibold text-lg mb-4">Resources</h3>
             <ul className="space-y-2">
               <li>
-                <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
+                <a href="https://climbing-geometry-e85.notion.site/The-Career-Connect-Blog-1d5bbb3a0be08094ad21f76b339ceddc?pvs=4" className="text-muted-foreground hover:text-primary transition-colors">
                   Blog
                 </a>
               </li>
@@ -60,12 +60,12 @@ const Footer = () => {
                 </a>
               </li>
               <li>
-                <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
+                <a href="https://climbing-geometry-e85.notion.site/Privacy-Policy-1d5bbb3a0be080c18812eb001ba99f1d?pvs=4" className="text-muted-foreground hover:text-primary transition-colors">
                   Privacy Policy
                 </a>
               </li>
               <li>
-                <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
+                <a href="https://climbing-geometry-e85.notion.site/Website-Terms-of-Service-1d5bbb3a0be080c1877adb232c7311eb?pvs=4" className="text-muted-foreground hover:text-primary transition-colors">
                   Terms of Service
                 </a>
               </li>
@@ -82,8 +82,8 @@ const Footer = () => {
               </li>
               <li className="flex items-center space-x-2">
                 <Mail className="h-4 w-4 text-primary" />
-                <a href="mailto:contact@jobbridge.com" className="text-muted-foreground hover:text-primary transition-colors">
-                  contact@jobbridge.com
+                <a href="mailto:contact@careerconnect" className="text-muted-foreground hover:text-primary transition-colors">
+                  contact@careerconnect
                 </a>
               </li>
               <li className="flex items-center space-x-2">
@@ -97,7 +97,7 @@ const Footer = () => {
         </div>
 
         <div className="border-t mt-12 pt-8 text-center text-muted-foreground">
-          <p>&copy; {new Date().getFullYear()} JobBridge. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} Career Connect. All rights reserved.</p>
         </div>
       </div>
     </footer>

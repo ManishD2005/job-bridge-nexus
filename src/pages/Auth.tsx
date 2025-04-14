@@ -116,7 +116,7 @@ const Auth = () => {
             <TabsContent value="login">
               <Card>
                 <CardHeader>
-                  <CardTitle>Login to JobBridge</CardTitle>
+                  <CardTitle>Login to Career Connect</CardTitle>
                   <CardDescription>
                     Enter your credentials to access your account
                   </CardDescription>

@@ -32,7 +32,7 @@ const App = () => (
             <Route path="/auth" element={<Auth />} />
             <Route path="/company/auth" element={<CompanyAuth />} />
             <Route path="/company/dashboard" element={
-              <ProtectedRoute>
+              <ProtectedRoute companyOnly={true}>
                 <CompanyDashboard />
               </ProtectedRoute>
             } />

@@ -12,6 +12,8 @@ import Jobs from "./pages/Jobs";
 import JobDetail from "./pages/JobDetail";
 import Profile from "./pages/Profile";
 import Auth from "./pages/Auth";
+import CompanyAuth from "./components/Auth/CompanyAuth";
+import CompanyDashboard from "./pages/company/Dashboard";
 import NotFound from "./pages/NotFound";
 import ProtectedRoute from "./components/Auth/ProtectedRoute";
 import VirtualBooth from "./pages/VirtualBooth";
@@ -28,6 +30,12 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
+            <Route path="/company/auth" element={<CompanyAuth />} />
+            <Route path="/company/dashboard" element={
+              <ProtectedRoute>
+                <CompanyDashboard />
+              </ProtectedRoute>
+            } />
             <Route path="/companies" element={<Companies />} />
             <Route path="/companies/:id" element={<CompanyDetail />} />
             <Route path="/jobs" element={<Jobs />} />

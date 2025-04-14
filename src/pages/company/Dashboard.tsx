@@ -26,42 +26,72 @@ const CompanyDashboard: React.FC = () => {
 
   const fetchCompanyData = async () => {
     try {
-      // Fetch company ID first
-      const { data: companyData } = await supabase
+      // Fetch current user session
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        toast.error('Not authenticated');
+        return;
+      }
+
+      // Fetch company ID for the current user
+      const { data: companyData, error: companyError } = await supabase
         .from('company_accounts')
         .select('company_id')
-        .eq('id', supabase.auth.getUser().then(res => res.data.user?.id))
+        .eq('id', user.id)
         .single();
 
-      if (!companyData) {
+      if (companyError || !companyData) {
         toast.error('Company account not found');
+        console.error('Error fetching company data:', companyError);
         return;
       }
 
       // Fetch applications
-      const { data: applicationsData } = await supabase
+      const { data: applicationsData, error: applicationsError } = await supabase
         .from('applications')
         .select(`
           id, 
           status, 
           applied_at,
-          jobs (title)
+          jobs (id, title)
         `)
         .eq('jobs.company_id', companyData.company_id);
 
+      if (applicationsError) {
+        console.error('Error fetching applications:', applicationsError);
+      }
+
+      // Transform applications data to match JobApplication interface
+      const formattedApplications = (applicationsData || []).map(app => ({
+        id: app.id,
+        job_title: app.jobs?.title || 'Unknown Job',
+        applicant_name: 'Applicant', // We would need to fetch this from profiles table
+        status: app.status,
+        applied_at: app.applied_at
+      }));
+
       // Fetch jobs
-      const { data: jobsData } = await supabase
+      const { data: jobsData, error: jobsError } = await supabase
         .from('jobs')
         .select('*')
         .eq('company_id', companyData.company_id);
 
+      if (jobsError) {
+        console.error('Error fetching jobs:', jobsError);
+      }
+
       // Fetch virtual booths
-      const { data: boothsData } = await supabase
+      const { data: boothsData, error: boothsError } = await supabase
         .from('virtual_booth_sessions')
         .select('*')
         .eq('company_id', companyData.company_id);
 
-      setApplications(applicationsData || []);
+      if (boothsError) {
+        console.error('Error fetching booths:', boothsError);
+      }
+
+      setApplications(formattedApplications);
       setJobs(jobsData || []);
       setVirtualBooths(boothsData || []);
     } catch (error) {
@@ -86,13 +116,17 @@ const CompanyDashboard: React.FC = () => {
               <CardTitle>Job Applications</CardTitle>
             </CardHeader>
             <CardContent>
-              {applications.map(app => (
-                <div key={app.id} className="border-b py-2">
-                  <p>{app.jobs?.title}</p>
-                  <p>Status: {app.status}</p>
-                  <p>Applied At: {new Date(app.applied_at).toLocaleDateString()}</p>
-                </div>
-              ))}
+              {applications.length > 0 ? (
+                applications.map(app => (
+                  <div key={app.id} className="border-b py-2">
+                    <p>{app.job_title}</p>
+                    <p>Status: {app.status}</p>
+                    <p>Applied At: {new Date(app.applied_at).toLocaleDateString()}</p>
+                  </div>
+                ))
+              ) : (
+                <p>No applications found</p>
+              )}
             </CardContent>
           </Card>
         </TabsContent>
@@ -103,12 +137,16 @@ const CompanyDashboard: React.FC = () => {
               <CardTitle>Your Jobs</CardTitle>
             </CardHeader>
             <CardContent>
-              {jobs.map(job => (
-                <div key={job.id} className="border-b py-2">
-                  <p>{job.title}</p>
-                  <p>{job.description}</p>
-                </div>
-              ))}
+              {jobs.length > 0 ? (
+                jobs.map(job => (
+                  <div key={job.id} className="border-b py-2">
+                    <p>{job.title}</p>
+                    <p>{job.description}</p>
+                  </div>
+                ))
+              ) : (
+                <p>No jobs found</p>
+              )}
             </CardContent>
           </Card>
         </TabsContent>
@@ -119,13 +157,17 @@ const CompanyDashboard: React.FC = () => {
               <CardTitle>Virtual Booths</CardTitle>
             </CardHeader>
             <CardContent>
-              {virtualBooths.map(booth => (
-                <div key={booth.id} className="border-b py-2">
-                  <p>{booth.title}</p>
-                  <p>{booth.description}</p>
-                  <p>Scheduled: {new Date(booth.scheduled_date).toLocaleString()}</p>
-                </div>
-              ))}
+              {virtualBooths.length > 0 ? (
+                virtualBooths.map(booth => (
+                  <div key={booth.id} className="border-b py-2">
+                    <p>{booth.title}</p>
+                    <p>{booth.description}</p>
+                    <p>Scheduled: {new Date(booth.scheduled_date).toLocaleString()}</p>
+                  </div>
+                ))
+              ) : (
+                <p>No virtual booths found</p>
+              )}
             </CardContent>
           </Card>
         </TabsContent>

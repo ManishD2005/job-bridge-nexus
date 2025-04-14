@@ -1,70 +1,73 @@
+# Welcome to your Lovable project
 
-# CareerConnect
+## Project info
 
-A job portal application connecting job seekers with companies.
+**URL**: https://lovable.dev/projects/e8c2da86-ecb6-4127-90ea-f91d58cbf65b
 
-## Features
+## How can I edit this code?
 
-- Job seeker and company portals
-- Job listings and applications
-- Company profiles
-- Virtual booth for online interviews
+There are several ways of editing your application.
 
-## Demo Company Accounts
+**Use Lovable**
 
-For demonstration purposes, you can use these company accounts:
+Simply visit the [Lovable Project](https://lovable.dev/projects/e8c2da86-ecb6-4127-90ea-f91d58cbf65b) and start prompting.
 
-- Email: technova@example.com
-- Email: ecosolutions@example.com
-- Email: financewave@example.com
+Changes made via Lovable will be committed automatically to this repo.
 
-Password for all demo accounts: `Company123!`
+**Use your preferred IDE**
 
-## Local Development
+If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
 
-To run this project locally:
+The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
 
-1. Clone the repository
-2. Install dependencies:
+Follow these steps:
 
-```bash
-npm install
-# or
-yarn install
-# or
-bun install
-```
+```sh
+# Step 1: Clone the repository using the project's Git URL.
+git clone <YOUR_GIT_URL>
 
-3. Start the development server:
+# Step 2: Navigate to the project directory.
+cd <YOUR_PROJECT_NAME>
 
-```bash
+# Step 3: Install the necessary dependencies.
+npm i
+
+# Step 4: Start the development server with auto-reloading and an instant preview.
 npm run dev
-# or
-yarn dev
-# or
-bun dev
 ```
 
-4. Open your browser and navigate to `http://localhost:5173`
+**Edit a file directly in GitHub**
 
-## Supabase Setup
+- Navigate to the desired file(s).
+- Click the "Edit" button (pencil icon) at the top right of the file view.
+- Make your changes and commit the changes.
 
-This project uses Supabase for authentication and database functionality. To set up your own Supabase instance:
+**Use GitHub Codespaces**
 
-1. Create a new project on [Supabase](https://supabase.io)
-2. Run the SQL scripts in `src/sql/company_accounts.sql` to set up sample company data
-3. Update the Supabase URL and key in `src/integrations/supabase/client.ts`
+- Navigate to the main page of your repository.
+- Click on the "Code" button (green button) near the top right.
+- Select the "Codespaces" tab.
+- Click on "New codespace" to launch a new Codespace environment.
+- Edit files directly within the Codespace and commit and push your changes once you're done.
 
-## Technologies Used
+## What technologies are used for this project?
 
-- React
+This project is built with:
+
+- Vite
 - TypeScript
+- React
+- shadcn-ui
 - Tailwind CSS
-- Shadcn UI
-- Supabase
-- React Router
-- React Query
 
-## License
+## How can I deploy this project?
 
-MIT
+Simply open [Lovable](https://lovable.dev/projects/e8c2da86-ecb6-4127-90ea-f91d58cbf65b) and click on Share -> Publish.
+
+## Can I connect a custom domain to my Lovable project?
+
+Yes, you can!
+
+To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+
+Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)

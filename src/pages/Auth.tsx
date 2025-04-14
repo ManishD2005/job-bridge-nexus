@@ -16,10 +16,7 @@ const Auth = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [loginData, setLoginData] = useState({ 
-    email: "", 
-    password: "" 
-  });
+  const [loginData, setLoginData] = useState({ email: "", password: "" });
   const [signupData, setSignupData] = useState({ 
     fullName: "", 
     email: "", 
@@ -43,18 +40,12 @@ const Auth = () => {
         password: loginData.password,
       });
 
-      if (error) throw error;
-
-      // Check user type and redirect accordingly
-      const { data: userTypeData } = await supabase.rpc('get_user_type', { user_id: data.user?.id });
-      
-      if (userTypeData === 'company') {
-        navigate('/company/dashboard');
-      } else {
-        navigate('/');
+      if (error) {
+        throw error;
       }
 
       toast.success("Login successful!");
+      navigate("/");
     } catch (error: any) {
       toast.error(error.message || "Failed to login. Please try again.");
     } finally {
@@ -90,15 +81,20 @@ const Auth = () => {
         options: {
           data: {
             full_name: signupData.fullName,
-            user_type: 'jobseeker'
           },
         },
       });
 
-      if (error) throw error;
+      if (error) {
+        throw error;
+      }
 
       toast.success("Registration successful! Please check your email to verify your account.");
-      navigate("/");
+      
+      // Auto-login after signup
+      if (data?.user) {
+        navigate("/");
+      }
     } catch (error: any) {
       toast.error(error.message || "Failed to sign up. Please try again.");
     } finally {
@@ -120,7 +116,7 @@ const Auth = () => {
             <TabsContent value="login">
               <Card>
                 <CardHeader>
-                  <CardTitle>Login to CareerConnect</CardTitle>
+                  <CardTitle>Login to JobBridge</CardTitle>
                   <CardDescription>
                     Enter your credentials to access your account
                   </CardDescription>
@@ -165,12 +161,6 @@ const Auth = () => {
                           {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                         </button>
                       </div>
-                    </div>
-                    <div className="mt-4 text-sm text-center">
-                      <p>Are you a company looking to hire?</p>
-                      <Link to="/company/auth" className="text-primary hover:underline mt-1 inline-block">
-                        Login as a company
-                      </Link>
                     </div>
                   </CardContent>
                   <CardFooter>
@@ -252,9 +242,6 @@ const Auth = () => {
                           onChange={(e) => setSignupData({...signupData, confirmPassword: e.target.value})}
                         />
                       </div>
-                    </div>
-                    <div className="pt-4 text-sm text-muted-foreground">
-                      <p className="text-center">For company registration, please contact us at support@careerconnect.com</p>
                     </div>
                   </CardContent>
                   <CardFooter>

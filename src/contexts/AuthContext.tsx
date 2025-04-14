@@ -9,7 +9,6 @@ interface AuthContextType {
   profile: any | null;
   isLoading: boolean;
   signOut: () => Promise<void>;
-  userType: string | null;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -19,7 +18,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<any | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [userType, setUserType] = useState<string | null>(null);
 
   useEffect(() => {
     // Set up the auth state listener
@@ -32,11 +30,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (currentSession?.user) {
           setTimeout(() => {
             fetchProfile(currentSession.user.id);
-            fetchUserType(currentSession.user.id);
           }, 0);
         } else {
           setProfile(null);
-          setUserType(null);
         }
       }
     );
@@ -48,7 +44,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       
       if (currentSession?.user) {
         fetchProfile(currentSession.user.id);
-        fetchUserType(currentSession.user.id);
       }
       setIsLoading(false);
     });
@@ -77,22 +72,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const fetchUserType = async (userId: string) => {
-    try {
-      const { data, error } = await supabase
-        .rpc('get_user_type', { user_id: userId });
-
-      if (error) {
-        console.error("Error fetching user type:", error);
-        return;
-      }
-
-      setUserType(data);
-    } catch (error) {
-      console.error("Error in fetchUserType:", error);
-    }
-  };
-
   const signOut = async () => {
     try {
       await supabase.auth.signOut();
@@ -103,7 +82,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ session, user, profile, isLoading, signOut, userType }}>
+    <AuthContext.Provider value={{ session, user, profile, isLoading, signOut }}>
       {children}
     </AuthContext.Provider>
   );

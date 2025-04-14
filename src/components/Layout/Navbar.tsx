@@ -1,7 +1,7 @@
 
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Menu, X, Building2 } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import ThemeToggle from "@/components/ThemeToggle";
@@ -9,25 +9,15 @@ import { useAuth } from "@/contexts/AuthContext";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { user, signOut, userType } = useAuth();
+  const { user, signOut } = useAuth();
   const location = useLocation();
   
-  // Different nav links for company users vs job seekers
-  const jobSeekerLinks = [
+  const navLinks = [
     { name: "Home", path: "/" },
     { name: "Companies", path: "/companies" },
     { name: "Jobs", path: "/jobs" },
     { name: "Virtual Booth", path: "/virtual-booth" },
   ];
-  
-  const companyLinks = [
-    { name: "Dashboard", path: "/company/dashboard" },
-    { name: "Companies", path: "/companies" },
-    { name: "Jobs", path: "/jobs" },
-  ];
-  
-  // Use appropriate links based on user type
-  const navLinks = userType === 'company' ? companyLinks : jobSeekerLinks;
 
   const isActive = (path: string) => {
     return location.pathname === path;
@@ -37,13 +27,8 @@ const Navbar = () => {
     <header className="border-b bg-background">
       <div className="container mx-auto px-4 flex items-center justify-between h-16">
         {/* Logo */}
-        <Link to={userType === 'company' ? "/company/dashboard" : "/"} className="font-bold text-xl flex items-center">
+        <Link to="/" className="font-bold text-xl flex items-center">
           <span className="text-primary mr-1">Career</span>Connect
-          {userType === 'company' && (
-            <span className="ml-2 bg-primary/10 text-primary text-xs px-2 py-0.5 rounded-full">
-              Company
-            </span>
-          )}
         </Link>
 
         {/* Desktop Navigation */}
@@ -67,18 +52,9 @@ const Navbar = () => {
           
           {user ? (
             <>
-              {userType === 'company' ? (
-                <Link to="/company/dashboard">
-                  <Button variant="outline" size="sm">
-                    <Building2 className="mr-2 h-4 w-4" />
-                    Dashboard
-                  </Button>
-                </Link>
-              ) : (
-                <Link to="/profile">
-                  <Button variant="ghost" size="sm">Profile</Button>
-                </Link>
-              )}
+              <Link to="/profile">
+                <Button variant="ghost" size="sm">Profile</Button>
+              </Link>
               <Button 
                 variant="outline" 
                 size="sm"
@@ -88,14 +64,9 @@ const Navbar = () => {
               </Button>
             </>
           ) : (
-            <>
-              <Link to="/auth">
-                <Button variant="outline">Job Seeker Sign In</Button>
-              </Link>
-              <Link to="/company/auth">
-                <Button>Company Sign In</Button>
-              </Link>
-            </>
+            <Link to="/auth">
+              <Button>Sign In</Button>
+            </Link>
           )}
         </div>
 
@@ -127,18 +98,9 @@ const Navbar = () => {
                 <div className="border-t my-4 pt-4 flex flex-col gap-2">
                   {user ? (
                     <>
-                      {userType === 'company' ? (
-                        <Link to="/company/dashboard" onClick={() => setIsMenuOpen(false)}>
-                          <Button variant="outline" className="w-full justify-start">
-                            <Building2 className="mr-2 h-4 w-4" />
-                            Company Dashboard
-                          </Button>
-                        </Link>
-                      ) : (
-                        <Link to="/profile" onClick={() => setIsMenuOpen(false)}>
-                          <Button variant="ghost" className="w-full justify-start">Profile</Button>
-                        </Link>
-                      )}
+                      <Link to="/profile" onClick={() => setIsMenuOpen(false)}>
+                        <Button variant="ghost" className="w-full justify-start">Profile</Button>
+                      </Link>
                       <Button 
                         variant="outline" 
                         className="w-full justify-start"
@@ -151,14 +113,9 @@ const Navbar = () => {
                       </Button>
                     </>
                   ) : (
-                    <>
-                      <Link to="/auth" onClick={() => setIsMenuOpen(false)}>
-                        <Button variant="outline" className="w-full">Job Seeker Sign In</Button>
-                      </Link>
-                      <Link to="/company/auth" onClick={() => setIsMenuOpen(false)}>
-                        <Button className="w-full">Company Sign In</Button>
-                      </Link>
-                    </>
+                    <Link to="/auth" onClick={() => setIsMenuOpen(false)}>
+                      <Button className="w-full">Sign In</Button>
+                    </Link>
                   )}
                 </div>
               </nav>

@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { toast } from "sonner";
@@ -50,6 +51,22 @@ const Auth = () => {
       // Check user type and redirect accordingly
       const { data: userTypeData } = await supabase.rpc('get_user_type', { user_id: data.user?.id });
       
+      // If requested company login but user is not a company account, show error
+      if (loginData.userType === 'company' && userTypeData !== 'company') {
+        await supabase.auth.signOut();
+        toast.error("This is not a company account. Please use a company account or switch to job seeker login.");
+        setIsLoading(false);
+        return;
+      }
+      
+      // If requested jobseeker login but user is a company account, show error
+      if (loginData.userType === 'jobseeker' && userTypeData === 'company') {
+        await supabase.auth.signOut();
+        toast.error("This is a company account. Please use job seeker credentials or switch to company login.");
+        setIsLoading(false);
+        return;
+      }
+      
       if (userTypeData === 'company') {
         navigate('/company/dashboard');
       } else {
@@ -84,6 +101,12 @@ const Auth = () => {
       return;
     }
 
+    // For company accounts, company name is required
+    if (signupData.userType === 'company' && !signupData.companyName) {
+      toast.error("Company name is required for company accounts");
+      return;
+    }
+
     try {
       setIsLoading(true);
       const { data, error } = await supabase.auth.signUp({
@@ -102,9 +125,13 @@ const Auth = () => {
 
       toast.success("Registration successful! Please check your email to verify your account.");
       
-      // Auto-login after signup
+      // Redirect based on user type
       if (data?.user) {
-        navigate("/");
+        if (signupData.userType === 'company') {
+          navigate("/company/dashboard");
+        } else {
+          navigate("/");
+        }
       }
     } catch (error: any) {
       toast.error(error.message || "Failed to sign up. Please try again.");

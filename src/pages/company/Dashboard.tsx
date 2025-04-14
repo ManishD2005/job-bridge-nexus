@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
@@ -112,23 +113,41 @@ const CompanyDashboard: React.FC = () => {
             id,
             title
           ),
-          profiles!applications_user_id_fkey (
-            full_name
-          )
+          user_id
         `)
         .eq('jobs.company_id', companyId);
 
       if (applicationsError) {
         console.error('Error fetching applications:', applicationsError);
       } else if (applicationsData) {
+        // Get applicant profiles in a separate query
+        const userIds = applicationsData.map(app => app.user_id);
+        const { data: profilesData, error: profilesError } = await supabase
+          .from('profiles')
+          .select('id, full_name')
+          .in('id', userIds);
+        
+        if (profilesError) {
+          console.error('Error fetching profiles:', profilesError);
+        }
+        
+        // Create a map of user_id -> full_name for quick lookup
+        const profileMap = new Map();
+        if (profilesData) {
+          profilesData.forEach(profile => {
+            profileMap.set(profile.id, profile.full_name);
+          });
+        }
+        
         // Transform applications data to match JobApplication interface
         const formattedApplications = applicationsData.map(app => ({
           id: app.id,
           job_title: app.jobs?.title || 'Unknown Job',
-          applicant_name: app.profiles?.full_name || 'Unknown Applicant',
+          applicant_name: profileMap.get(app.user_id) || 'Unknown Applicant',
           status: app.status,
           applied_at: new Date(app.applied_at).toLocaleDateString()
         }));
+        
         setApplications(formattedApplications);
       }
 
@@ -152,18 +171,51 @@ const CompanyDashboard: React.FC = () => {
           booth_participants (
             id,
             status,
-            user_id,
-            profiles:user_id (
-              full_name
-            )
+            user_id
           )
         `)
         .eq('company_id', companyId);
 
       if (boothsError) {
         console.error('Error fetching booths:', boothsError);
-      } else {
-        setVirtualBooths(boothsData || []);
+      } else if (boothsData) {
+        // For each booth, fetch participant profiles
+        const enhancedBooths = await Promise.all(boothsData.map(async (booth) => {
+          if (booth.booth_participants && booth.booth_participants.length > 0) {
+            const participantIds = booth.booth_participants.map((p: any) => p.user_id);
+            const { data: participantProfiles, error: participantError } = await supabase
+              .from('profiles')
+              .select('id, full_name')
+              .in('id', participantIds);
+            
+            if (participantError) {
+              console.error('Error fetching participant profiles:', participantError);
+              return booth;
+            }
+            
+            // Create profiles map
+            const profilesMap = new Map();
+            if (participantProfiles) {
+              participantProfiles.forEach(profile => {
+                profilesMap.set(profile.id, profile);
+              });
+            }
+            
+            // Enhance participants with profile data
+            const enhancedParticipants = booth.booth_participants.map((participant: any) => ({
+              ...participant,
+              profiles: profilesMap.get(participant.user_id) || { full_name: 'Unknown' }
+            }));
+            
+            return {
+              ...booth,
+              booth_participants: enhancedParticipants
+            };
+          }
+          return booth;
+        }));
+        
+        setVirtualBooths(enhancedBooths || []);
       }
       
       setIsLoading(false);

@@ -1,4 +1,4 @@
-# Welcome to your Career Connect
+# Welcome to Career Connect
 ## Project info
 
 **URL**: https://careerconnect2025.netlify.app/

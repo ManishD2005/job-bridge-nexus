@@ -1,8 +1,7 @@
-
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { toast } from "sonner";
-import { Eye, EyeOff, Mail, Lock, User } from "lucide-react";
+import { Eye, EyeOff, Mail, Lock, User, Building2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -16,12 +15,18 @@ const Auth = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [loginData, setLoginData] = useState({ email: "", password: "" });
+  const [loginData, setLoginData] = useState({ 
+    email: "", 
+    password: "",
+    userType: "jobseeker" 
+  });
   const [signupData, setSignupData] = useState({ 
     fullName: "", 
     email: "", 
     password: "", 
-    confirmPassword: "" 
+    confirmPassword: "",
+    userType: "jobseeker",
+    companyName: "" 
   });
 
   // Handle login submission
@@ -40,12 +45,18 @@ const Auth = () => {
         password: loginData.password,
       });
 
-      if (error) {
-        throw error;
+      if (error) throw error;
+
+      // Check user type and redirect accordingly
+      const { data: userTypeData } = await supabase.rpc('get_user_type', { user_id: data.user?.id });
+      
+      if (userTypeData === 'company') {
+        navigate('/company/dashboard');
+      } else {
+        navigate('/');
       }
 
       toast.success("Login successful!");
-      navigate("/");
     } catch (error: any) {
       toast.error(error.message || "Failed to login. Please try again.");
     } finally {
@@ -81,13 +92,13 @@ const Auth = () => {
         options: {
           data: {
             full_name: signupData.fullName,
+            user_type: signupData.userType,
+            ...(signupData.userType === 'company' ? { company_name: signupData.companyName } : {})
           },
         },
       });
 
-      if (error) {
-        throw error;
-      }
+      if (error) throw error;
 
       toast.success("Registration successful! Please check your email to verify your account.");
       
@@ -160,6 +171,27 @@ const Auth = () => {
                         >
                           {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                         </button>
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Account Type</Label>
+                      <div className="flex space-x-4">
+                        <Button
+                          type="button"
+                          variant={loginData.userType === 'jobseeker' ? 'default' : 'outline'}
+                          className="flex-1"
+                          onClick={() => setLoginData({...loginData, userType: 'jobseeker'})}
+                        >
+                          <User className="mr-2 h-4 w-4" /> Job Seeker
+                        </Button>
+                        <Button
+                          type="button"
+                          variant={loginData.userType === 'company' ? 'default' : 'outline'}
+                          className="flex-1"
+                          onClick={() => setLoginData({...loginData, userType: 'company'})}
+                        >
+                          <Building2 className="mr-2 h-4 w-4" /> Company
+                        </Button>
                       </div>
                     </div>
                   </CardContent>
@@ -243,6 +275,40 @@ const Auth = () => {
                         />
                       </div>
                     </div>
+                    <div className="space-y-2">
+                      <Label>Account Type</Label>
+                      <div className="flex space-x-4">
+                        <Button
+                          type="button"
+                          variant={signupData.userType === 'jobseeker' ? 'default' : 'outline'}
+                          className="flex-1"
+                          onClick={() => setSignupData({...signupData, userType: 'jobseeker'})}
+                        >
+                          <User className="mr-2 h-4 w-4" /> Job Seeker
+                        </Button>
+                        <Button
+                          type="button"
+                          variant={signupData.userType === 'company' ? 'default' : 'outline'}
+                          className="flex-1"
+                          onClick={() => setSignupData({...signupData, userType: 'company'})}
+                        >
+                          <Building2 className="mr-2 h-4 w-4" /> Company
+                        </Button>
+                      </div>
+                    </div>
+
+                    {signupData.userType === 'company' && (
+                      <div className="space-y-2">
+                        <Label htmlFor="signup-company-name">Company Name</Label>
+                        <Input 
+                          id="signup-company-name"
+                          placeholder="Enter your company name"
+                          value={signupData.companyName}
+                          onChange={(e) => setSignupData({...signupData, companyName: e.target.value})}
+                          required
+                        />
+                      </div>
+                    )}
                   </CardContent>
                   <CardFooter>
                     <Button type="submit" className="w-full" disabled={isLoading}>

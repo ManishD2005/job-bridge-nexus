@@ -1,0 +1,11 @@
+node_modules/
+dist/
+coverage/
+build/
+public/
+.github/
+.vscode/
+*.d.ts
+vite.config.ts
+vitest.config.ts
+tailwind.config.ts 

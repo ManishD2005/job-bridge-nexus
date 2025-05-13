@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:80"
+    restart: unless-stopped
+
+  # Development mode with hot reloading
+  dev:
+    image: node:20-alpine
+    command: sh -c "npm install && npm run dev -- --host"
+    ports:
+      - "5173:5173"
+    volumes:
+      - .:/app
+      - node_modules:/app/node_modules
+    working_dir: /app
+    environment:
+      - NODE_ENV=development
+      - VITE_HOST=0.0.0.0
+    restart: unless-stopped
+
+volumes:
+  node_modules: 

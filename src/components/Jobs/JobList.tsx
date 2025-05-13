@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Search, Filter } from "lucide-react";
@@ -8,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { PostgrestError } from "@supabase/supabase-js";
+import { JobType } from "@/types/JobTypes";
 
 const JobList = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -33,27 +33,23 @@ const JobList = () => {
       const { data, error } = await supabase
         .from('jobs')
         .select(`
-          id,
-          title,
-          description,
-          location,
-          job_type,
-          salary_range,
-          posted_date,
-          company:companies (
-            id,
-            name,
-            logo_url
-          )
+          *,
+          company:companies(id, name, logo_url)
         `)
         .order('posted_date', { ascending: false });
 
       if (error) {
+        console.error('Supabase error details:', error);
         throw error;
       }
 
+      if (!data) {
+        console.error('No data returned from Supabase');
+        throw new Error('No data returned from database');
+      }
+
       // Transform the data to match our JobProps structure
-      const formattedJobs: JobProps[] = data.map(job => ({
+      const formattedJobs = data.map(job => ({
         id: job.id,
         title: job.title,
         company: {
@@ -62,7 +58,7 @@ const JobList = () => {
           logo: job.company.logo_url || ""
         },
         location: job.location || "Remote",
-        type: job.job_type as any || "Full-time",
+        type: job.job_type as JobType || "Full-time",
         salary: job.salary_range,
         postedDate: new Date(job.posted_date).toLocaleDateString(),
         description: job.description
@@ -79,9 +75,9 @@ const JobList = () => {
       setLocations(locs as string[]);
       
     } catch (error) {
+      console.error('Full error object:', error);
       const pgError = error as PostgrestError;
-      toast.error(`Error fetching jobs: ${pgError.message}`);
-      console.error(error);
+      toast.error(`Error fetching jobs: ${pgError.message || 'Unknown error occurred'}`);
     } finally {
       setIsLoading(false);
     }

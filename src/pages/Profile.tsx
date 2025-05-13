@@ -10,11 +10,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { User, FileText, Briefcase, Clock, CheckCircle2, XCircle, AlertCircle, Save } from "lucide-react";
+import { User, Briefcase, Clock, CheckCircle2, XCircle, AlertCircle, Save } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import ProtectedRoute from "@/components/Auth/ProtectedRoute";
+import ResumeUpload from "@/components/Profile/ResumeUpload";
 
 interface Application {
   id: string;
@@ -40,6 +41,7 @@ const Profile = () => {
     email: "",
     location: "",
     about: "",
+    resume_url: null as string | null,
   });
   const [skills, setSkills] = useState<string[]>([]);
   const [newSkill, setNewSkill] = useState("");
@@ -54,6 +56,7 @@ const Profile = () => {
         email: profile.email || user?.email || "",
         location: profile.location || "",
         about: profile.about || "",
+        resume_url: profile.resume_url || null,
       });
     }
   }, [profile, user]);
@@ -172,6 +175,13 @@ const Profile = () => {
 
   const handleRemoveSkill = (skillToRemove: string) => {
     setSkills(skills.filter(skill => skill !== skillToRemove));
+  };
+
+  const handleResumeUploadComplete = (url: string | null) => {
+    setProfileData(prev => ({
+      ...prev,
+      resume_url: url
+    }));
   };
 
   const getStatusBadge = (status: string) => {
@@ -305,7 +315,7 @@ const Profile = () => {
                     <Card className="mt-8">
                       <CardHeader>
                         <CardTitle className="flex items-center">
-                          <FileText className="h-5 w-5 mr-2" />
+                          <User className="h-5 w-5 mr-2" />
                           Resume / CV
                         </CardTitle>
                         <CardDescription>
@@ -313,12 +323,10 @@ const Profile = () => {
                         </CardDescription>
                       </CardHeader>
                       <CardContent>
-                        <div className="border border-dashed rounded-lg p-8 text-center">
-                          <FileText className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-                          <p className="mb-2">Drag and drop your resume here, or click to browse</p>
-                          <p className="text-sm text-muted-foreground mb-4">PDF, DOCX or RTF up to 5MB</p>
-                          <Button variant="outline">Upload Resume</Button>
-                        </div>
+                        <ResumeUpload 
+                          currentResumeUrl={profileData.resume_url} 
+                          onUploadComplete={handleResumeUploadComplete} 
+                        />
                       </CardContent>
                     </Card>
                   </div>
@@ -344,7 +352,7 @@ const Profile = () => {
                               </button>
                             </Badge>
                           ))}
-                          {skills.length ===.0 && (
+                          {skills.length === 0 && (
                             <p className="text-sm text-muted-foreground">No skills added yet.</p>
                           )}
                         </div>

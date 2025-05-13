@@ -211,6 +211,7 @@ export type Database = {
           full_name: string | null
           id: string
           location: string | null
+          resume_url: string | null
           updated_at: string
         }
         Insert: {
@@ -220,6 +221,7 @@ export type Database = {
           full_name?: string | null
           id: string
           location?: string | null
+          resume_url?: string | null
           updated_at?: string
         }
         Update: {
@@ -229,6 +231,7 @@ export type Database = {
           full_name?: string | null
           id?: string
           location?: string | null
+          resume_url?: string | null
           updated_at?: string
         }
         Relationships: []
@@ -317,7 +320,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_user_type: {
+        Args: { user_id: string }
+        Returns: string
+      }
     }
     Enums: {
       [_ in never]: never

@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { UploadCloud, File, X, Check, Loader2 } from "lucide-react";
+import { UploadCloud, FileText, X, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { useAuth } from "@/contexts/AuthContext";
@@ -173,7 +173,6 @@ const ResumeUpload = ({ currentResumeUrl, onUploadComplete }: ResumeUploadProps)
           <label>
             <Button 
               variant="outline" 
-              as="span" 
               disabled={isUploading}
               className="cursor-pointer"
             >
@@ -199,7 +198,7 @@ const ResumeUpload = ({ currentResumeUrl, onUploadComplete }: ResumeUploadProps)
         <div className="border rounded-lg p-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
-              <File className="h-8 w-8 text-primary" />
+              <FileText className="h-8 w-8 text-primary" />
               <div>
                 <p className="font-medium truncate max-w-[200px]">{resumeName || "Resume"}</p>
                 <p className="text-sm text-muted-foreground">Uploaded successfully</p>
@@ -227,8 +226,7 @@ const ResumeUpload = ({ currentResumeUrl, onUploadComplete }: ResumeUploadProps)
               <label>
                 <Button 
                   variant="outline" 
-                  size="sm" 
-                  as="span"
+                  size="sm"
                   disabled={isUploading}
                   className="cursor-pointer"
                 >
